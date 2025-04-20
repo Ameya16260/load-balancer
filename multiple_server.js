@@ -38,4 +38,7 @@ const createServers = (host, port) => {
    })
 }
 
-createServers('127.0.0.1', PORT);
+for(let i=0;i<PORT;i++){
+   let a=5000+i
+   createServers('127.0.0.1', a);
+}

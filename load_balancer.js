@@ -5,8 +5,11 @@ const { roundRobin, randomChoice, leastConnections } = require('./algorithms');
 const PORT = 8080;
 const HEALTH_CHECK_INTERVAL = 5000;
 
-// Determine the algorithm from command line argument
 const algorithm = process.argv[2] || 'roundRobin';
+if(algorithm!='roundRobin' && algorithm!='randomChoice' && algorithm!='leastConnections'  ){
+    console.log("kindly choose a correct algorithm")
+    return
+}
 console.log(`Using load balancing algorithm: ${algorithm}`);
 
 const serverLoad = {}; // Used for leastConnections
@@ -25,6 +28,13 @@ function getServer() {
             return roundRobin(servers);
     }
 }
+function printServerLoad() {
+    console.log("\n📊 Current Server Load:");
+    for (const [server, load] of Object.entries(serverLoad)) {
+        console.log(`${server} => ${load} active connection(s)`);
+    }
+    console.log();
+}
 
 async function forwardRequest(req, res) {
     const servers = registry.getServers();
@@ -35,7 +45,7 @@ async function forwardRequest(req, res) {
         return res.end("No available servers");
     }
 
-    // Track server load for leastConnections
+    
     if (algorithm === 'leastConnections') {
         serverLoad[target] = (serverLoad[target] || 0) + 1;
     }
@@ -76,6 +86,7 @@ const server = http.createServer((req, res) => {
                 }
 
                 registry.addServer(url);
+                serverLoad[url] = 0;
                 res.writeHead(200);
                 res.end('Server registered');
             } catch (err) {
@@ -86,6 +97,10 @@ const server = http.createServer((req, res) => {
     } else if (req.method === 'GET' && req.url === '/servers') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(registry.getServers()));
+    }else if (req.method === 'GET' && req.url === '/server-load') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(serverLoad, null, 2));
+        printServerLoad(); 
     } else {
         forwardRequest(req, res);
     }
