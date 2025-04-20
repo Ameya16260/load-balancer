@@ -24,9 +24,9 @@ const createServers = (host, port) => {
       }
       if (req.url === '/test') {
          console.log(`Request received on Port:${port} from ${req.url}`)
-         await delay(1000); 
+         await delay(10000); 
          res.writeHead(200, { "Content-Type": "text/plain" });
-         return res.end(`Delayed response from port: ${port}`);
+         return res.end(`Response from port: ${port}`);
       }
       console.log(`Request received on Port:${port} from ${req.url}`)
       res.writeHead(200, { "Content-Type": "text/plain" });

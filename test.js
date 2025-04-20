@@ -1,4 +1,4 @@
-const NUM_REQUESTS =10;
+const NUM_REQUESTS = process.argv[2] || 10;
 const URL = 'http://127.0.0.1:8080/test';
 
 (async () => {
@@ -8,7 +8,6 @@ const URL = 'http://127.0.0.1:8080/test';
   let successCount = 0;
   let failureCount = 0;
 
-  // Create an array of promises for all requests
   const requests = [];
 
   for (let i = 0; i < NUM_REQUESTS; i++) {
@@ -31,14 +30,13 @@ const URL = 'http://127.0.0.1:8080/test';
         console.error(`❌ Request ${completed} failed:`, err.message);
       });
 
-    // Push each promise to the array
+    
     requests.push(request);
   }
 
-  // Wait for all requests to complete
+  
   await Promise.all(requests);
 
-  // After all requests are complete, log the final statistics
   const totalTime = Date.now() - start;
   const successRate = ((successCount / NUM_REQUESTS) * 100).toFixed(2);
   console.log(`\nTotal time taken: ${totalTime}ms`);

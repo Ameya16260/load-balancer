@@ -34,6 +34,8 @@ function printServerLoad() {
         console.log(`${server} => ${load} active connection(s)`);
     }
     console.log();
+    console.log();
+    console.log();
 }
 
 async function forwardRequest(req, res) {
@@ -44,11 +46,11 @@ async function forwardRequest(req, res) {
         res.writeHead(503, { "Content-Type": "text/plain" });
         return res.end("No available servers");
     }
-
+    console.log(`Forwarding the request to ${target}`)
     
-    if (algorithm === 'leastConnections') {
+    
         serverLoad[target] = (serverLoad[target] || 0) + 1;
-    }
+    
 
     try {
         const proxyRes = await fetch(target + req.url, {
@@ -66,9 +68,9 @@ async function forwardRequest(req, res) {
         res.writeHead(502, { "Content-Type": "text/plain" });
         res.end("Bad Gateway");
     } finally {
-        if (algorithm === 'leastConnections') {
+        
             serverLoad[target] = Math.max(0, (serverLoad[target] || 1) - 1);
-        }
+        
     }
 }
 
@@ -126,6 +128,7 @@ function healthCheckLoop() {
         servers = registry.getServers();
         console.log(`Available servers:`);
         console.log(servers);
+        printServerLoad();
     }, HEALTH_CHECK_INTERVAL);
 }
 
